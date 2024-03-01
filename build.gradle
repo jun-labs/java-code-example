@@ -1,24 +1,69 @@
-plugins {
-    id("java")
-    id("org.springframework.boot") version("3.1.8")
-    id("io.spring.dependency-management") version("1.1.4")
+buildscript {
+    ext {
+        springBootVersion = "3.1.9"
+        dependencyManagementVersion = "1.1.4"
+        mutinyVersion = "2.1.0"
+        coroutineVersion = "1.6.0"
+    }
+
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:$springBootVersion")
+        classpath("io.spring.gradle:dependency-management-plugin:$dependencyManagementVersion")
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion")
+    }
 }
+
+apply(plugin: "java")
+apply(plugin: "org.springframework.boot")
+apply(plugin: "io.spring.dependency-management")
+apply(plugin: "org.jetbrains.kotlin.jvm")
 
 repositories {
     mavenCentral()
 }
 
 dependencies {
-    implementation("org.springframework.boot:spring-boot-starter")
-    implementation("org.springframework.boot:spring-boot-starter-web")
-    implementation("org.projectlombok:lombok:1.18.22")
-    testImplementation("org.springframework.boot:spring-boot-starter-test")
+    // Kotlin
+    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion")
+
+    // SpringBoot
+    implementation("org.springframework.boot:spring-boot-starter:$springBootVersion")
+    implementation("org.springframework.boot:spring-boot-starter-web:$springBootVersion")
+
+    // Mutiny
+    implementation("io.smallrye.reactive:mutiny:$mutinyVersion")
+
+    // Lombok
+    implementation("org.projectlombok:lombok:$lombokVersion")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutineVersion")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:$coroutineVersion")
+
+    // Test
+    testImplementation("org.springframework.boot:spring-boot-starter-test:$springBootVersion")
+    testImplementation("io.kotest:kotest-runner-junit5:$kotestVersion")
+    testImplementation("io.kotest:kotest-assertions-core:$kotestVersion")
+    testImplementation("io.kotest:kotest-framework-engine:$kotestVersion")
 }
 
 tasks.named("bootBuildImage") {
-    builder = "paketobuildpacks/builder-jammy-base:latest"
+    builder = "paketobuildpacks/builder-jammy-base:$builderVersion"
 }
 
 tasks.named("test") {
     useJUnitPlatform()
+}
+
+compileKotlin {
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+}
+compileTestKotlin {
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
 }
